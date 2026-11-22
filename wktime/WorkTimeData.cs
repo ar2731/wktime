@@ -8,7 +8,9 @@ namespace wktime
 {
 	public class WorkTimeData
 	{
-		private static readonly char[] Separators = new char[]
+        private static readonly string DefaultNormalizedStrSeparator = " - ";
+
+        private static readonly char[] Separators = new char[]
 		{
 			' ', '.', ',', ';', '-', '_', '|', '!', '*', '/',
 			'+', '·', '•', '➔'
@@ -18,7 +20,7 @@ namespace wktime
 		public TimeSpan StartTime => Timestamps[0];
 		public TimeSpan EndTime => Timestamps[Timestamps.Count - 1];
 		public TimeSpan BreakDuration { get; }
-		private ReadOnlyCollection<BreakInterval> BreakIntervals { get; }
+		public  ReadOnlyCollection<BreakInterval> BreakIntervals { get; }
 		public TimeSpan WorkHours => EndTime - StartTime - BreakDuration;
 		public ReadOnlyCollection<TimeSpan> Timestamps { get; }
 		public string DbStartTime => string.Format(CultureInfo.InvariantCulture, "{0:yyyy-MM-dd} {1}", Date, FormatTimeSpanHHmm(StartTime));
@@ -60,13 +62,18 @@ namespace wktime
 			}
 		}
 
-		public string NormalizedTimeData => GetNormalizedTimeData(" - ");
+		public string NormalizedTimeData => GetNormalizedTimeData();
 		public string OriginalTimeData { get; }
 		public int BreakCount => BreakIntervals.Count;
 
+		public string GetNormalizedTimeData() => GetNormalizedTimeData(DefaultNormalizedStrSeparator);
+
 		public string GetNormalizedTimeData(string separator)
 		{
-			separator = separator ?? string.Empty;
+			if (string.IsNullOrEmpty(separator))
+            {
+				separator = DefaultNormalizedStrSeparator;
+			}
 
 			StringBuilder sb = new StringBuilder();
 
